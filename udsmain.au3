@@ -22,6 +22,9 @@
 #include <InetConstants.au3>
 #include <String.au3>
 #include <ButtonConstants.au3>
+#include <ButtonConstants.au3>
+#include <GUIConstantsEx.au3>
+#include <WindowsConstants.au3>
 
 
 Global $optUpdate, $aIsMajor, $LatestVersionDev, $aVersionActual, $aCurVersion, $isMajor, $updateStat, $folderpath, $nvar, $cuicountdown, $rndvarprog, $radio4, $radio3, $progress1, $slidecheckbox, $readslide, $slider1, $button2, $label14, $rndnumbinput, $min, $max, $rndnumb, $message, $ms, $msgs, $spamnumb, $input1, $input2, $input3, $button1, $input4, $label1, $label2, $label3, $radio1, $radio2, $msgstosend, $spammeduser, $label5, $label6, $label7, $label8, $suicidalscript, $label10, $label11, $label12, $label13, $label14, $label15, $label16
@@ -34,16 +37,15 @@ Func spmGui()
 	ConsoleWrite('@@ (34) :(' & @MIN & ':' & @SEC & ') spmGui()' & @CR) ;### Function Trace
 	#Region ### START Koda GUI section ### Form=
 	$form1_1_1 = GUICreate("xstmaSpamBot", 260, 250, 900, 400, BitOr($WS_BORDER, $WS_POPUP), BitOR($WS_EX_TOPMOST, $WS_EX_TOOLWINDOW))
-	$label4 = GUICtrlCreateLabel("UP ARROW KILLS THE SCRIPT", 45, 45, 400, 17)
-	$label4 = GUICtrlCreateLabel("RESTART AFTER AUTH", 60, 60, 400, 17)
-	$button1 = GUICtrlCreateButton("PULL", 150, 120, 100, 30)
-	$button55 = GUICtrlCreateButton("PUSH", 10, 120, 100, 30)
-	$button99 = GUICtrlCreateButton("QUIT", 10, 215, 240, 30)
+	$button1 = GUICtrlCreateButton("PULL", 150, 100, 100, 30)
+	$button55 = GUICtrlCreateButton("PUSH", 10, 100, 100, 30)
+	$button99 = GUICtrlCreateButton("QUIT", 80, 170, 100, 80, $BS_BITMAP)
+	GUICtrlSetImage(-1, "exit.bmp")
 	$progress1 = GUICtrlCreateProgress(10, 8, 240, 25)
 	GUISetState(@SW_SHOW)
 	#EndRegion ### END Koda GUI section ###
 	GUISetState(@SW_SHOW)
-
+	GUISetBkColor(0xFFFFFF)
 
 	While 1
 		$msg = GUIGetMsg()
