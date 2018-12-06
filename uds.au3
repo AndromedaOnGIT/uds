@@ -37,6 +37,7 @@ Func spmGui()
 	$input1 = GUICtrlCreateInput("", 100, 80, 150, 21)
 	$label1 = GUICtrlCreateLabel("File dir", 10, 80, 80, 17)
 	$label4 = GUICtrlCreateLabel("UP ARROW KILLS THE SCRIPT", 45, 45, 400, 17)
+	$label4 = GUICtrlCreateLabel("RESTART AFTER AUTH", 60, 60, 400, 17)
 	$button1 = GUICtrlCreateButton("GO", 150, 120, 100, 30)
 	$button55 = GUICtrlCreateButton("Authorize Access", 10, 120, 100, 30)
 	$button99 = GUICtrlCreateButton("QUIT", 10, 215, 240, 30)
@@ -84,10 +85,10 @@ Func button1()
 	GUISetState(@SW_DISABLE)
 	If GUICtrlRead($radio1) = $gui_checked Then
 		HotKeySet("{UP}", "EmergencyStop")
-		custSpam()
+		file()
 	Else
 		HotKeySet("{UP}", "EmergencyStop")
-		custSpam()
+		file()
 	EndIf
 EndFunc   ;==>button1
 
@@ -100,7 +101,7 @@ Func emergencyStop()
 	Send(" ")
 	Send("{ENTER}")
 	Sleep(30)
-	Run("xstmaSpamBot.exe", "", "")
+	Run("uds.exe", "", "")
 	Exit
 EndFunc   ;==>emergencyStop
 
@@ -115,17 +116,31 @@ Func kill()
 	Exit
 EndFunc 
 
+func file()
+	$filedir = GUICtrlRead($input1)
+	GUICtrlSetData($progress1, 10)
+	FileWrite ( "filedir.bat", "python uds.py push ")
+	GUICtrlSetData($progress1, 20)
+	FileWrite ( "filedir.bat", $filedir )
+	GUICtrlSetData($progress1, 30)
+	FileWrite ( "filedir.bat", "&& pause")
+	GUICtrlSetData($progress1, 40)
+	custSpam()
+EndFunc
+
 Func custSpam()
 	ConsoleWrite('@@ (150) :(' & @MIN & ':' & @SEC & ') custSpam()' & @CR) ;### Function Trace
-	GUICtrlSetData($progress1, 0)
+	GUICtrlSetData($progress1, 50)
 	$rndvarprog = False
-	$filedir = GUICtrlRead($input1)
-	
+	RunWait("filedir.bat")
+	GUICtrlSetData($progress1, 60)
+	GUICtrlSetData($progress1, 100)
+	FileDelete ( "filedir.bat" )
 EndFunc   ;==>custSpam
 
 Func auth()
 	ConsoleWrite('@@ (150) :(' & @MIN & ':' & @SEC & ') custSpam()' & @CR) ;### Function Trace
 	GUICtrlSetData($progress1, 0)
 	$rndvarprog = False
-	RunWait("C:\Python27\Python.exe uds.py")
+	Run("auth.bat")
 EndFunc  

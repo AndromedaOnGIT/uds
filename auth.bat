@@ -1,0 +1,1 @@
+python uds.py && echo Sucessfully Authorized && Pause
