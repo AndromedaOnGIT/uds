@@ -1,5 +1,6 @@
-# :milky_way: UDS : Unlimited Drive Storage
+# :milky_way: UDS : Unlimited Drive Storage - GUI
 
+A GUI Port of UDS for Windows
 Store files in Google Docs without counting against your quota.
 
 ### Features
