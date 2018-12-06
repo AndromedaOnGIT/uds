@@ -136,11 +136,13 @@ Func custSpam()
 	GUICtrlSetData($progress1, 60)
 	GUICtrlSetData($progress1, 100)
 	FileDelete ( "filedir.bat" )
+	emergencyStop()
 EndFunc   ;==>custSpam
 
 Func auth()
 	ConsoleWrite('@@ (150) :(' & @MIN & ':' & @SEC & ') custSpam()' & @CR) ;### Function Trace
 	GUICtrlSetData($progress1, 0)
 	$rndvarprog = False
-	Run("auth.bat")
+	RunWait("auth.bat")
+	emergencyStop()
 EndFunc  
