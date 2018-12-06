@@ -40,7 +40,7 @@ Func spmGui()
 	$label4 = GUICtrlCreateLabel("RESTART AFTER AUTH", 60, 60, 400, 17)
 	$button1 = GUICtrlCreateButton("GO", 150, 120, 100, 30)
 	$button55 = GUICtrlCreateButton("Authorize Access", 10, 120, 100, 30)
-	$button99 = GUICtrlCreateButton("QUIT", 10, 215, 240, 30)
+	$button99 = GUICtrlCreateButton("BACK", 10, 215, 240, 30)
 	$progress1 = GUICtrlCreateProgress(10, 8, 240, 25)
 	GUISetState(@SW_SHOW)
 	#EndRegion ### END Koda GUI section ###
@@ -121,7 +121,9 @@ func file()
 	GUICtrlSetData($progress1, 10)
 	FileWrite ( "filedir.bat", "python uds.py push ")
 	GUICtrlSetData($progress1, 20)
+	
 	FileWrite ( "filedir.bat", $filedir )
+
 	GUICtrlSetData($progress1, 30)
 	FileWrite ( "filedir.bat", "&& pause")
 	GUICtrlSetData($progress1, 40)
