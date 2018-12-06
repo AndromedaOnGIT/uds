@@ -14,6 +14,37 @@ Store files in Google Docs without counting against your quota.
 - A single google doc can store about a million characters. This is around 710KB of base64 encoded data.
 - Some experiments with multithreading the uploads, but there was no significant performance increase.
 
+
+## Gui Way
+
+### Authentication
+
+1. Click Push
+2. Authorize Access
+3. This will open a new tab in your browser for you to sign in with
+4. You may have to restart the program before uploading
+
+### Upload
+
+1. Click Push then enter your filename
+- currently only supports current directory (issue with the gui not the underlying python if someone wants to fix this please do)
+2. Click GO :smile:
+
+### List
+
+1. Click Pull
+2. Click Get List
+
+### Download
+
+1. Click Pull
+2. Enter Id found in previous step
+3. Click Go
+4. File will be in the download dir
+
+
+## Manual Way
+
 ### Authentication
 
 1. Head to [Google's API page](https://developers.google.com/drive/api/v3/quickstart/python) and enable the Drive API
