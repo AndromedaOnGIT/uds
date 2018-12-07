@@ -1,5 +1,0 @@
-	ConsoleWrite('@@ (150) :(' & @MIN & ':' & @SEC & ') custSpam()' & @CR) ;### Function Trace
-	GUICtrlSetData($progress1, 0)
-	$rndvarprog = False
-	RunWait("auth.bat")
-	emergencyStop()

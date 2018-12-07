@@ -39,12 +39,22 @@ Func spmGui()
 	$label4 = GUICtrlCreateLabel("UP ARROW KILLS THE SCRIPT", 45, 45, 400, 17)
 	$label4 = GUICtrlCreateLabel("RESTART AFTER AUTH", 60, 60, 400, 17)
 	$button1 = GUICtrlCreateButton("GO", 150, 120, 100, 30)
+	    GUICtrlSetBKColor(-1,0x4250f4)
+     	GUICtrlSetColor(-1,0xFFFFFF)
 	$button55 = GUICtrlCreateButton("Authorize Access", 10, 120, 100, 30)
+	    GUICtrlSetBKColor(-1,0x4250f4)
+     	GUICtrlSetColor(-1,0xFFFFFF)
 	$button99 = GUICtrlCreateButton("BACK", 10, 215, 240, 30)
+	    GUICtrlSetBKColor(-1,0x4250f4)
+     	GUICtrlSetColor(-1,0xFFFFFF)
 	$progress1 = GUICtrlCreateProgress(10, 8, 240, 25)
 	GUISetState(@SW_SHOW)
 	#EndRegion ### END Koda GUI section ###
 	GUISetState(@SW_SHOW)
+	GUISetBkColor(0xFFFFFF)
+	GUICtrlSetFont($Button99, 14, 200, 0, "ABeeZee", 1)
+	GUICtrlSetFont($Button1, 14, 200, 0, "ABeeZee", 1)
+	GUICtrlSetFont($Button55, 8, 200, 0, "ABeeZee", 1)
 
 
 	While 1
