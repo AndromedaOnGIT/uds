@@ -3,11 +3,6 @@
 ### A GUI Port of UDS for Windows
 Store files in Google Docs without counting against your quota.
 
-### Download
-
-I recommend reading this whole page before downloading
-- https://github.com/PatrickMitchellUI/uds-gui-windows/releases/latest/
-
 ### Features
 
 - Upload files to Google Drive without using storage space
