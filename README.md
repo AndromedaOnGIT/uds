@@ -9,6 +9,10 @@ sorry @ the guys from google internal forums who are looking at this
 - Upload files to Google Drive without using storage space
 - Download any stored files to your computer
 
+### GUI
+
+For a GUI version (windows only) check out https://github.com/PatrickMitchellUI/uds-gui-windows
+
 ### Logic
 
 - Size of the encoded file is always larger than the original. Base64 encodes binary data to a ratio of about 4:3.
