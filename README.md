@@ -1,3 +1,6 @@
+# The GUI no longer works and I dont have the time to fix it
+## go check out https://github.com/stewartmcgown/uds for a working command line version
+
 # :milky_way: UDS : Unlimited Drive Storage
 
 Store files in Google Docs without counting against your quota.
