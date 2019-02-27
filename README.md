@@ -3,6 +3,8 @@
 ### A GUI Port of UDS for Windows
 Store files in Google Docs without counting against your quota.
 
+sorry @ the guys from google internal forums who are looking at this
+
 ### Features
 
 - Upload files to Google Drive without using storage space

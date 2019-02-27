@@ -23,6 +23,7 @@ import shutil
 import cryptography
 import concurrent.futures
 import Format
+import argparse
 
 import Encoder
 
@@ -43,6 +44,13 @@ CHUNK_READ_LENGTH_BYTES = 750000
 class UDS():
     def __init__(self):
         self.api = GoogleAPI()
+
+    def delete_file(self, id):
+        try:
+            self.api.delete_file(id)
+            print("Deleted %s" % id)
+        except:
+            print("%s File was not a UDS file" % GoogleAPI.ERROR_OUTPUT)
 
     def build_file(self, parent_id):
         # This will fetch the Docs one by one, concatting them
@@ -149,15 +157,16 @@ class UDS():
         total = 0
         total_chunks = len(chunk_list)
 
-        """for chunk in chunk_list:
+        for chunk in chunk_list:
             total = total + 1
             self.upload_chunked_part(chunk)
             elapsed_time = round(time.time() - start_time, 2)
-            current_speed = round((total * CHUNK_READ_LENGTH_BYTES) / (elapsed_time * 1024 * 1024), 2)
+            current_speed = round(
+                (total * CHUNK_READ_LENGTH_BYTES) / (elapsed_time * 1024 * 1024), 2)
             progress_bar("Uploading %s at %sMB/s" %
-                         (media.name, current_speed), total, total_chunks)"""
+                         (media.name, current_speed), total, total_chunks)
 
-        # Concurrently execute chunk upload and report back when done.
+        """# Concurrently execute chunk upload and report back when done.
         with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS_ALLOWED) as executor:
             for file in executor.map(ext_upload_chunked_part, chunk_list):
                 total = total + file
@@ -165,12 +174,60 @@ class UDS():
                 current_speed = round(
                     (total) / (elapsed_time * 1024 * 1024), 2)
                 progress_bar("Uploading %s at %sMB/s" %
-                             (media.name, current_speed), total, size)
+                             (media.name, current_speed), total, size)"""
 
         finish_time = round(time.time() - start_time, 1)
 
         progress_bar("Uploaded %s in %ss" %
                      (media.name, finish_time), 1, 1)
+
+    def convert_file(self, file_id):
+        # Get file metadata
+        metadata = service.files().get(fileId=file_id, fields="name").execute()
+
+        # Download the file and then call do_upload() on it
+        request = service.files().get_media(fileId=file_id)
+        path = "%s/%s" % (get_downloads_folder(), metadata['name'])
+        fh = io.FileIO(path, "wb")
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+
+        print("Downloaded %s" % metadata['name'])
+        do_upload(path, service)
+
+        # An alternative method would be to use partial download headers
+        # and convert and upload the parts individually. Perhaps a
+        # future release will implement this.
+
+    def list(self, opts=None):
+        items = self.api.list_files(opts)
+
+        if not items:
+            print('No UDS files found.')
+        else:
+            #print('\nUDS Files in Drive:')
+            total = 0
+            table = []
+            saved_bytes = 0
+            for item in items:
+                record = [item.name, item.size,
+                          item.encoded_size, item.id_, item.shared]
+                table.append(record)
+
+            print(tabulate(table, headers=[
+                  'Name', 'Size', 'Encoded', 'ID', 'Shared']))
+
+    def actions(self, action, args):
+        switcher = {
+            "list": self.list,
+            "push": self.do_chunked_upload,
+            "pull": self.build_file,
+            "delete": self.delete_file
+        }
+
+        switcher.get(action)(args)
 
 
 def get_downloads_folder():
@@ -201,44 +258,8 @@ def write_status(status):
     sys.stdout.flush()
 
 
-def assign_property(id):
-    body = {
-        'key': 'uds',
-        'value': 'true',
-        'visibility': 'PUBLIC'
-    }
-
-    try:
-        p = service.properties().insert(
-            fileId=id, body=body).execute()
-        return p
-    except error:
-        print('An error occurred: %s' % error)
-    return None
-
-
-def convert_file(file_id, service):
-    # Get file metadata
-    metadata = service.files().get(fileId=file_id, fields="name").execute()
-
-    # Download the file and then call do_upload() on it
-    request = service.files().get_media(fileId=file_id)
-    path = f"{get_downloads_folder()}/{metadata['name']}"
-    fh = io.FileIO(path, "wb")
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-
-    print("Downloaded %s" % metadata['name'])
-    do_upload(path, service)
-
-    # An alternative method would be to use partial download headers
-    # and convert and upload the parts individually. Perhaps a
-    # future release will implement this.
-
-
 def main():
+    global BASE_FOLDER, USE_MULTITHREADED_UPLOADS, DELETE_FILE_AFTER_CONVERT
     uds = UDS()
 
     # Initial look for folder and first time setup if not
@@ -265,7 +286,7 @@ def main():
         elif command == "pull":
             uds.build_file(sys.argv[2])
         elif command == "list":
-            uds.api.print_list_files()
+            uds.list()
         elif command == "convert":
             if sys.argv[2] == "--delete":
                 DELETE_FILE_AFTER_CONVERT = True
@@ -280,6 +301,8 @@ def main():
 
 
 # Upload a chunked part to drive and return the size of the chunk
+
+
 def ext_upload_chunked_part(chunk):
     api = GoogleAPI()
     #print("Chunk %s, bytes %s to %s" % (chunk.part, chunk.range_start, chunk.range_end))
@@ -308,4 +331,7 @@ def ext_upload_chunked_part(chunk):
 
 
 if __name__ == '__main__':
-    main()
+    if (sys.version_info[0] < 3):
+        print("%s You must use Python 3+" % GoogleAPI.ERROR_OUTPUT)
+    else:
+        main()
