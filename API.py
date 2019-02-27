@@ -118,7 +118,7 @@ class GoogleAPI():
                 name=f.get("name"),
                 base64=None,
                 mime=f.get("mimeType"),
-                size=f.get("size"),
+                size=props.get("size"),
                 size_numeric=props.get("size_numeric"),
                 encoded_size=props.get("encoded_size"),
                 id=f.get("id"),
@@ -150,6 +150,7 @@ class GoogleAPI():
         # Ensure the file is a UDS one
         try:
             info = self.service.files().get(fileId=id, fields="*").execute()
+<<<<<<< HEAD
             print(info)
             if info.get("properties").get("uds"):
                 return self.service.files().delete(fileId=id).execute()
@@ -161,6 +162,19 @@ class GoogleAPI():
     def get_file(self, id):
         return self.service.files().get(fileId=id).execute()
 
+=======
+
+            if info.get("properties").get("uds"):
+                return self.service.files().delete(fileId=id).execute()
+            else:
+                raise FileNotUDSException()
+        except:
+            raise FileNotFoundException()
+
+    def get_file(self, id):
+        return self.service.files().get(fileId=id).execute()
+
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
     def export_media(self, id):
         return self.service.files().export_media(fileId=id, mimeType='text/plain')
 

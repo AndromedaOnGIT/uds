@@ -24,6 +24,11 @@ import cryptography
 import concurrent.futures
 import Format
 import argparse
+<<<<<<< HEAD
+=======
+import re
+import json
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
 
 import Encoder
 
@@ -45,12 +50,27 @@ class UDS():
     def __init__(self):
         self.api = GoogleAPI()
 
+<<<<<<< HEAD
     def delete_file(self, id):
         try:
             self.api.delete_file(id)
             print("Deleted %s" % id)
         except:
             print("%s File was not a UDS file" % GoogleAPI.ERROR_OUTPUT)
+=======
+    def delete_file(self, id, name=None, mode_=None):  # Added argument name for commands using name argument
+        try:
+            self.api.delete_file(id)
+            if name is not None:
+                print("Deleted %s" % name)  # If Alpha commands are used, this displays the name
+            else:
+                print("Deleted %s" % id)  # If UDS commands are used, this displays the ID
+        except:
+            if mode_ != "quiet":
+                print("%s File was not a UDS file" % GoogleAPI.ERROR_OUTPUT)
+            else:
+                print("", end='')
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
 
     def build_file(self, parent_id):
         # This will fetch the Docs one by one, concatting them
@@ -136,7 +156,7 @@ class UDS():
                         Format.format(size), Format.format(encoded_size), parents=[root], size_numeric=size)
 
         parent = self.api.create_media_folder(media)
-        print("Created parent folder with ID %s" % (parent['id']))
+        print(" Created parent folder with ID %s" % (parent['id']))
 
         # Should be the same
         no_chunks = math.ceil(size / CHUNK_READ_LENGTH_BYTES)
@@ -200,6 +220,38 @@ class UDS():
         # An alternative method would be to use partial download headers
         # and convert and upload the parts individually. Perhaps a
         # future release will implement this.
+<<<<<<< HEAD
+=======
+    def update(self, mode=0, opts=None):  # Mode sets the mode of updating 0 > Verbose, 1 > Notification, 2 > silent
+        items = self.api.list_files(opts)
+        if not items:
+            print('No UDS files found.')
+        elif mode != 2:  # Duplicate silent...
+            table = []
+            with open("data.txt", 'w') as init:  # Create data.txt if it does not exist
+                init.write("{")
+                init.write("}")
+            for item in items:  # Show online data in form Encoded >> Size to show drive size and on disk size in order
+                record = [item.name, item.encoded_size, item.size, item.id_]
+                with open("data.txt", 'r') as data3:  # Read data stored offline
+                    user_data = json.load(data3)
+                temp_name = str(item.name)
+                user_data[temp_name] = item.id_
+                with open("data.txt", 'w') as data4:  # Write data to data.txt
+                    json.dump(user_data, data4, indent=3)
+                table.append(record)
+                with open("User.txt", 'w') as user:
+                    user.write(tabulate(table, headers=['Name', 'Encoded', 'Size', 'ID']))
+            if mode == 0:  # Verbose
+                print(tabulate(table, headers=[
+                      'Name', 'Encoded', 'Size', 'ID']))
+            elif mode == 1:  # Notify
+                print("Data Updated!\n")
+            else:  # Silent Catch
+                print("", end='')
+        else:
+            print("", end='')
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
 
     def list(self, opts=None):
         items = self.api.list_files(opts)
@@ -208,6 +260,7 @@ class UDS():
             print('No UDS files found.')
         else:
             #print('\nUDS Files in Drive:')
+<<<<<<< HEAD
             total = 0
             table = []
             saved_bytes = 0
@@ -218,6 +271,105 @@ class UDS():
 
             print(tabulate(table, headers=[
                   'Name', 'Size', 'Encoded', 'ID', 'Shared']))
+=======
+            table = []
+            for item in items:
+                record = [item.name, item.size,
+                          item.encoded_size, item.id_]
+                table.append(record)
+
+            print(tabulate(table, headers=[
+                  'Name', 'Size', 'Encoded', 'ID']))
+
+    def erase(self, name, default=1, mode_=None, fallback=None):  # Alpha command to erase file via name
+        if fallback is not None:
+            self.delete_file(fallback, name=name, mode_=mode_)
+        else:
+            with open("data.txt", 'r') as list_:
+                data_pull = json.load(list_)
+                list_.close()
+            id_ = data_pull[name]
+            self.delete_file(id_, name=name, mode_=mode_)
+        self.update(mode=default)  # Updates files in data after being altered
+
+    def grab(self, name, default=1, fallback=None):  # Alpha command to pull files via name
+        self.update(mode=default)  # Sets update mode
+        if fallback is not None:
+            self.build_file(parent_id=fallback)
+            print("\n")
+        else:
+            with open("data.txt", 'r') as list_:  # Load ID values based on file name
+                data_pull = json.load(list_)
+            parent_id = data_pull[name]  # Loads ID based on name
+            self.build_file(parent_id)
+            print("\n")
+
+    def batch(self, part, opts=None):  # Alpha command to bulk download based on part of a file name
+        self.update(mode=1)  # Sets update mode
+        items = self.api.list_files(opts)
+        name_space = []  # List of names based on user part
+        id_space = []
+        check = 0
+        for item in items:  # Checks if part is in the name of any UDS file and adds them to queue
+            if str(part) is not "?":
+                if str(part) in str(item.name):  # The name check
+                    name_space.append(item.name)
+                    id_space.append(item.id_)
+                    check += 1
+                else:
+                    print("", end='')
+            elif str(part) is "?":
+                name_space.append(item.name)
+                id_space.append(item.id_)
+            else:  # Fallback for doing nothing, not necessary, just habit
+                print("", end='')
+        for i in range(check):
+            self.grab(fallback=id_space[i], name=name_space[i], default=2)
+        for names in range(len(name_space)):  # Downloads the bulk using data and names
+            self.grab(name_space[names], default=2)  # Update data, not necessary
+
+    def bunch(self, file_part, path='.'):  # Alpha command to bulk upload files based on file name part
+        files = os.listdir(path)  # Make list of all files in directory
+        files_upload = []
+        for name in files:  # Cycles through all files
+            if file_part is not "?":
+                if file_part in name:  # Checks if part is in any files and adds to list
+                    files_upload.append(name)
+                else:
+                    print("", end='')
+            elif file_part is "?":
+                files_upload.append(name)
+            else:  # Fallback
+                print("", end='')
+        for name_data in range(len(files_upload)):  # Upload all files put in list
+            full_path = str(path) + "/" + str(files_upload[name_data])
+            self.do_chunked_upload(full_path)
+        print("\n")
+        self.update(mode=1)  # Necessary update to data
+
+    def wipe(self, part, opts=None):  # Alpha command to bulk delete files based on file name part
+        self.update(mode=2)  # Sets update mode
+        items = self.api.list_files(opts)
+        name_space = []
+        id_space = []
+        check = 0
+        for item in items:  # Add names to list
+            if str(part) is not "?":
+                if str(part) in str(item.name):  # add names if they have part in them
+                    name_space.append(item.name)
+                    check += 1
+                    id_space.append(item.id_)
+                else:
+                    print("", end='')
+            elif str(part) is "?":
+                name_space.append(item.name)
+                check += 1
+                id_space.append(item.id_)
+            else:
+                print("")
+        for i in range(check):
+            self.erase(fallback=id_space[i], name=name_space[i], default=2)
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
 
     def actions(self, action, args):
         switcher = {
@@ -269,9 +421,15 @@ def main():
     # Options
     options = """
     push     Uploads a file from this computer [path_to_file]
+    bunch    Uploads files from this computer [word_in_file] [path_to_file]
     pull     Downloads a UDS file [id]
+    batch    Downloads UDS files [word_in_file]
+    grab     Downloads a UDS file [name]
     list     Finds all UDS files
+    update   Update cached UDS data
     delete   Deletes a UDS file [id]
+    erase    Deletes a UDS file [name]
+    wipe     Deletes UDS files [word_in_file]
     """
 
     if len(sys.argv) > 1:
@@ -283,10 +441,39 @@ def main():
             else:
                 file_path = sys.argv[2]
             uds.do_chunked_upload(file_path)
+        elif command == "bunch":
+            if sys.argv[2] == "--disbale-multi":
+                USE_MULTITHREADED_UPLOADS = False
+                if len(sys.argv) > 3:
+                    path = str(sys.argv[4])
+                    uds.bunch(sys.argv[3], path=path)
+                else:
+                    uds.bunch(sys.argv[3])
+            else:
+                if len(sys.argv) > 3:
+                    path = str(sys.argv[3])
+                    uds.bunch(sys.argv[2], path=path)
+                else:
+                    uds.bunch(sys.argv[2])
         elif command == "pull":
             uds.build_file(sys.argv[2])
+        elif command == "grab":
+            uds.grab(sys.argv[2])
+        elif command == "batch":
+            uds.batch(sys.argv[2])
         elif command == "list":
             uds.list()
+<<<<<<< HEAD
+=======
+        elif command == "update":
+            uds.update()
+        elif command == "delete":
+            uds.delete_file(sys.argv[2])
+        elif command == "erase":
+            uds.erase(sys.argv[2])
+        elif command == "wipe":
+            uds.wipe(sys.argv[2])
+>>>>>>> parent of 0d48ebc... Revert "updated with features from UDS"
         elif command == "convert":
             if sys.argv[2] == "--delete":
                 DELETE_FILE_AFTER_CONVERT = True
